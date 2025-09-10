@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { checkKYCStatus } from "../../redux/KycSlice";
+import { checkKYCStatus } from "../../redux/kycSlice";
 
 import { activeEsim } from "../../redux/esimSlice";
 import './Home.css';
