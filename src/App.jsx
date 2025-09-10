@@ -12,9 +12,9 @@ import Status from "./components/eSIM/Status";
 import AdminLogin from "./components/Admin/AdminLogin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Navbar from "./components/Common/Navbar";
-import { LoginUser } from "./redux/Createuser.js";
 import ForgotPasswordPage from "./components/ForgetPass/ForgotPasswordPage"
 import ResetPasswordPage from "./components/ForgetPass/ResetPasswordPage"
+import { LoginUser } from "./redux/Createuser";
 
 function App() {
   const dispatch = useDispatch();
