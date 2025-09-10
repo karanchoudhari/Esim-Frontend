@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { LoginUser } from '../../redux/Createuser';
+import { LoginUser } from '../../redux/Createuser.js';
 import './Login.css'; // We'll create this CSS file
 
 const Login = () => {

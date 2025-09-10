@@ -12,7 +12,7 @@ import Status from "./components/eSIM/Status";
 import AdminLogin from "./components/Admin/AdminLogin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Navbar from "./components/Common/Navbar";
-import { LoginUser } from "./redux/Createuser";
+import { LoginUser } from "./redux/Createuser.js";
 import ForgotPasswordPage from "./components/ForgetPass/ForgotPasswordPage"
 import ResetPasswordPage from "./components/ForgetPass/ResetPasswordPage"
 
@@ -27,7 +27,7 @@ function App() {
       const verifyToken = async () => {
         try {
           const response = await fetch(
-            "http://localhost:4000/api/v1/user/verify",
+            "https://esim-backend.vercel.app/api/v1/user/verify",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
