@@ -1,32 +1,9 @@
 import axios from 'axios';
 
-// const AxiosInstance = axios.create({
-//   baseURL: 'http://localhost:4000/api/v1'
-// });
-
-// // Add authorization header automatically
-// AxiosInstance.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token');
-//     // console.log('Axios sending token:', token); // Debug
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// export default AxiosInstance;
-
-
-// import axios from 'axios';
 
 // Default URLs
 const LOCAL_URL = "http://localhost:4000/api/v1";
-const PROD_URL = "https://esim-backend.vercel.app/api/v1";
+const PROD_URL = "https://esim-backend-lmen.onrender.com/api/v1";
 
 // Final base URL priority
 const baseURL =
@@ -52,3 +29,27 @@ AxiosInstance.interceptors.request.use(
 );
 
 export default AxiosInstance;
+
+  // const AxiosInstance = axios.create({
+  //   baseURL: 'http://localhost:4000/api/v1'
+  // });
+  
+  // // Add authorization header automatically
+  // AxiosInstance.interceptors.request.use(
+  //   (config) => {
+  //     const token = localStorage.getItem('token');
+  //     // console.log('Axios sending token:', token); // Debug
+  //     if (token) {
+  //       config.headers.Authorization = `Bearer ${token}`;
+  //     }
+  //     return config;
+  //   },
+  //   (error) => {
+  //     return Promise.reject(error);
+  //   }
+  // );
+  
+  // export default AxiosInstance;
+  
+  
+  // import axios from 'axios';

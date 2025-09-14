@@ -182,7 +182,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard" style={{marginTop:"5%"}}>
       {/* Header */}
       <div className="admin-header">
         <h1>
@@ -401,7 +401,7 @@ const AdminDashboard = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3>KYC Details</h3>
+              <h3>KYC Verification Details</h3>
               <button className="modal-close" onClick={() => {
                 setShowKYCModal(false);
                 setEditingKYC(false);
@@ -411,64 +411,98 @@ const AdminDashboard = () => {
             </div>
             
             <div className="modal-body">
-              <div className="details-grid">
-                <div className="detail-item">
-                  <h4>Full Name</h4>
-                  <p>{selectedKYC.user.name}</p>
+              {/* User Information */}
+              <div className="kyc-user-info">
+                <div className="kyc-user-avatar">
+                  <i className="fas fa-user"></i>
                 </div>
-                <div className="detail-item">
-                  <h4>Email</h4>
+                <div className="kyc-user-details">
+                  <h3>{selectedKYC.user.name}</h3>
                   <p>{selectedKYC.user.email}</p>
+                  <span className={`status-badge ${getStatusClass(selectedKYC.kyc.status)}`}>
+                    {selectedKYC.kyc.status}
+                  </span>
                 </div>
-                <div className="detail-item">
-                  <h4>KYC Status</h4>
-                  <p className={getStatusClass(selectedKYC.kyc.status)}>{selectedKYC.kyc.status}</p>
+              </div>
+              
+              {/* KYC Details */}
+              <div className="details-section">
+                <h4>Personal Information</h4>
+                <div className="details-grid">
+                  <div className="detail-row">
+                    <span className="detail-label">ID Type:</span>
+                    <span className="detail-value">{selectedKYC.kyc.idType || 'Not provided'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">ID Number:</span>
+                    <span className="detail-value">{selectedKYC.kyc.idNumber || 'Not provided'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Submitted On:</span>
+                    <span className="detail-value">{new Date(selectedKYC.kyc.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Last Updated:</span>
+                    <span className="detail-value">{new Date(selectedKYC.kyc.updatedAt).toLocaleDateString()}</span>
+                  </div>
                 </div>
-                {selectedKYC.kyc.idType && (
-                  <div className="detail-item">
-                    <h4>ID Type</h4>
-                    <p>{selectedKYC.kyc.idType}</p>
-                  </div>
-                )}
-                {selectedKYC.kyc.idNumber && (
-                  <div className="detail-item">
-                    <h4>ID Number</h4>
-                    <p>{selectedKYC.kyc.idNumber}</p>
-                  </div>
-                )}
               </div>
               
-              <div className="document-section">
-                <h4>ID Document Front</h4>
-                {selectedKYC.kyc.idFront ? (
-                  <div className="document-image">
-                    <img src={`http://localhost:4000/uploads/${selectedKYC.kyc.idFront}`} alt="ID Front" />
+              {/* Document Verification */}
+              <div className="document-verification-section">
+                <h4>Document Verification</h4>
+                <div className="document-grid">
+                  <div className="document-item">
+                    <h5>ID Document Front</h5>
+                    {selectedKYC.kyc.idFront ? (
+                      <div className="document-image">
+                        <img 
+                          src={`https://esim-backend-lmen.onrender.com/uploads/${selectedKYC.kyc.idFront}`} 
+                          alt="ID Front" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="no-document">
+                        <i className="fas fa-file-image"></i>
+                        <p>No document uploaded</p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <p>No document uploaded</p>
-                )}
-              </div>
-              
-              <div className="document-section">
-                <h4>ID Document Back</h4>
-                {selectedKYC.kyc.idBack ? (
-                  <div className="document-image">
-                    <img src={`http://localhost:4000/uploads/${selectedKYC.kyc.idBack}`} alt="ID Back" />
+                  
+                  <div className="document-item">
+                    <h5>ID Document Back</h5>
+                    {selectedKYC.kyc.idBack ? (
+                      <div className="document-image">
+                        <img 
+                          src={`https://esim-backend-lmen.onrender.com/uploads/${selectedKYC.kyc.idBack}`} 
+                          alt="ID Back" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="no-document">
+                        <i className="fas fa-file-image"></i>
+                        <p>No document uploaded</p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <p>No document uploaded</p>
-                )}
-              </div>
-              
-              <div className="document-section">
-                <h4>Selfie with ID</h4>
-                {selectedKYC.kyc.selfie ? (
-                  <div className="document-image">
-                    <img src={`http://localhost:4000/uploads/${selectedKYC.kyc.selfie}`} alt="Selfie with ID" />
+                  
+                  <div className="document-item">
+                    <h5>Selfie with ID</h5>
+                    {selectedKYC.kyc.selfie ? (
+                      <div className="document-image">
+                        <img 
+                          src={`https://esim-backend-lmen.onrender.com/uploads/${selectedKYC.kyc.selfie}`} 
+                          alt="Selfie with ID" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="no-document">
+                        <i className="fas fa-file-image"></i>
+                        <p>No selfie uploaded</p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <p>No selfie uploaded</p>
-                )}
+                </div>
               </div>
             </div>
             
@@ -478,23 +512,23 @@ const AdminDashboard = () => {
                   className="btn-primary" 
                   onClick={() => setEditingKYC(true)}
                 >
-                  <i className="fas fa-edit"></i> Edit Status
+                  <i className="fas fa-edit"></i> Update Status
                 </button>
               ) : (
-                <>
+                <div className="status-update-actions">
                   <button 
                     className="btn-success" 
                     onClick={() => handleKYCApproval(selectedKYC.kyc._id, 'approved', selectedKYC.user.name)}
                   >
-                    <i className="fas fa-check"></i> Approve
+                    <i className="fas fa-check"></i> Approve KYC
                   </button>
                   <button 
                     className="btn-danger" 
                     onClick={() => handleKYCApproval(selectedKYC.kyc._id, 'rejected', selectedKYC.user.name)}
                   >
-                    <i className="fas fa-times"></i> Reject
+                    <i className="fas fa-times"></i> Reject KYC
                   </button>
-                </>
+                </div>
               )}
               <button 
                 className="btn-secondary" 
@@ -525,42 +559,52 @@ const AdminDashboard = () => {
             </div>
             
             <div className="modal-body">
-              <div className="details-grid">
-                <div className="detail-item">
-                  <h4>User Name</h4>
-                  <p>{selectedESIM.userId?.name || 'Unknown User'}</p>
+              {/* User Information */}
+              <div className="esim-user-info">
+                <div className="esim-user-avatar">
+                  <i className="fas fa-sim-card"></i>
                 </div>
-                <div className="detail-item">
-                  <h4>User Email</h4>
+                <div className="esim-user-details">
+                  <h3>{selectedESIM.userId?.name || 'Unknown User'}</h3>
                   <p>{selectedESIM.userId?.email || 'N/A'}</p>
+                  <span className={`status-badge ${getStatusClass(selectedESIM.status)}`}>
+                    {selectedESIM.status}
+                  </span>
                 </div>
-                <div className="detail-item">
-                  <h4>Status</h4>
-                  <p className={getStatusClass(selectedESIM.status)}>{selectedESIM.status}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>ICCID</h4>
-                  <p>{selectedESIM.iccid || 'N/A'}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>SM-DP+ Address</h4>
-                  <p>{selectedESIM.smdpAddress || 'N/A'}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>Activation Code</h4>
-                  <p>{selectedESIM.activationCode || 'N/A'}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>Matching ID</h4>
-                  <p>{selectedESIM.matchingId || 'N/A'}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>Created At</h4>
-                  <p>{new Date(selectedESIM.createdAt).toLocaleString()}</p>
-                </div>
-                <div className="detail-item">
-                  <h4>Updated At</h4>
-                  <p>{new Date(selectedESIM.updatedAt).toLocaleString()}</p>
+              </div>
+              
+              {/* eSIM Details */}
+              <div className="details-section">
+                <h4>eSIM Information</h4>
+                <div className="details-grid">
+                  <div className="detail-row">
+                    <span className="detail-label">ICCID:</span>
+                    <span className="detail-value esim-data">{selectedESIM.iccid || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">SM-DP+ Address:</span>
+                    <span className="detail-value esim-data">{selectedESIM.smdpAddress || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Activation Code:</span>
+                    <span className="detail-value esim-data">{selectedESIM.activationCode || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Matching ID:</span>
+                    <span className="detail-value esim-data">{selectedESIM.matchingId || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Confirmation Code:</span>
+                    <span className="detail-value esim-data">{selectedESIM.confirmationCode || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Created At:</span>
+                    <span className="detail-value">{new Date(selectedESIM.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Last Updated:</span>
+                    <span className="detail-value">{new Date(selectedESIM.updatedAt).toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -571,23 +615,23 @@ const AdminDashboard = () => {
                   className="btn-primary" 
                   onClick={() => setEditingESIM(true)}
                 >
-                  <i className="fas fa-edit"></i> Edit Status
+                  <i className="fas fa-edit"></i> Update Status
                 </button>
               ) : (
-                <>
+                <div className="status-update-actions">
                   <button 
                     className="btn-success" 
                     onClick={() => handleESIMStatus(selectedESIM._id, 'activated', selectedESIM.userId?.name || 'user')}
                   >
-                    <i className="fas fa-check"></i> Activate
+                    <i className="fas fa-bolt"></i> Activate eSIM
                   </button>
                   <button 
                     className="btn-danger" 
                     onClick={() => handleESIMStatus(selectedESIM._id, 'failed', selectedESIM.userId?.name || 'user')}
                   >
-                    <i className="fas fa-times"></i> Reject
+                    <i className="fas fa-times"></i> Reject eSIM
                   </button>
-                </>
+                </div>
               )}
               <button 
                 className="btn-secondary" 

@@ -27,7 +27,7 @@ function App() {
       const verifyToken = async () => {
         try {
           const response = await fetch(
-            "https://esim-backend.vercel.app/api/v1/user/verify",
+            "https://esim-backend-lmen.onrender.com/api/v1/user/verify",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
