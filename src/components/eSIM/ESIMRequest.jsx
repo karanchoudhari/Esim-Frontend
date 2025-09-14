@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestESIM } from '../../redux/esimSlice';
-import { checkKYCStatus } from '../../redux/kycSlice.js';
+import { checkKYCStatus } from '../../redux/KycSlice.js';
 import { useNavigate } from 'react-router-dom';
 import AxiosInstance from "../../../Axiosinstance"
 
