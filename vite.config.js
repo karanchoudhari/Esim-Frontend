@@ -9,4 +9,7 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  esbuild: {
+    loader: 'jsx', // treat all .js files as JSX
+  }
 })

@@ -13,6 +13,7 @@ const Home = () => {
   const { kycStatus } = useSelector((state) => state.kyc);
   const { esim } = useSelector((state) => state.esim);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [showKYCPopup, setShowKYCPopup] = useState(false);
 
   useEffect(() => {
     // Only fetch KYC status and eSIM data if user is logged in
@@ -33,11 +34,20 @@ const Home = () => {
   };
 
   const HandleKYC = () => {
-    navigate('/kyc');
+    // If KYC is already submitted and status is pending, show popup
+    if (kycStatus === 'pending') {
+      setShowKYCPopup(true);
+    } else {
+      navigate('/kyc');
+    }
   };
 
   const HandleESIM = () => {
     navigate('/esimrequest');
+  };
+
+  const closeKYCPopup = () => {
+    setShowKYCPopup(false);
   };
 
   // Calculate counts from eSIM data
@@ -77,8 +87,10 @@ const Home = () => {
                 <div className="card-content">
                   <h3>Complete KYC Verification</h3>
                   <p>Verify your identity to request an eSIM and access all features</p>
-                  <button onClick={HandleKYC} className="btn-primary">
-                    <span>Start KYC Verification</span>
+                  <button onClick={HandleKYC} className="btn">
+                    <span>
+                      {kycStatus === 'pending' ? 'Check KYC Status' : 'Start KYC Verification'}
+                    </span>
                     <i className="fas fa-arrow-right"></i>
                   </button>
                 </div>
@@ -99,7 +111,7 @@ const Home = () => {
                 <div className="card-content">
                   <h3>Request eSIM</h3>
                   <p>Get your digital SIM card instantly delivered to your device</p>
-                  <button onClick={HandleESIM} className="btn-primary">
+                  <button onClick={HandleESIM} className="btn-secondary">
                     <span>Request eSIM Now</span>
                     <i className="fas fa-arrow-right"></i>
                   </button>
@@ -163,6 +175,36 @@ const Home = () => {
               </div>
             </div>
           </div>
+
+          {/* KYC Status Popup */}
+          {showKYCPopup && (
+            <div className="kyc-popup-overlay">
+              <div className="kyc-popup">
+                <div className="popup-header">
+                  <i className="fas fa-clock"></i>
+                  <h3>KYC Under Processing</h3>
+                  <button className="popup-close" onClick={closeKYCPopup}>
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                <div className="popup-content">
+                  <p>Your KYC verification is currently under review by our team.</p>
+                  <p>This process usually takes 24-48 hours. You'll be notified once your verification is complete.</p>
+                  <div className="popup-status">
+                    <div className="status-indicator pending">
+                      <i className="fas fa-sync-alt"></i>
+                      Status: Under Review
+                    </div>
+                  </div>
+                </div>
+                <div className="popup-actions">
+                  <button onClick={closeKYCPopup} className="btn-secondary">
+                    Got it!
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="not-logged-in">

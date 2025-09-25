@@ -100,7 +100,7 @@ const Status = () => {
           <h3>No eSIMs Yet</h3>
           <p>You haven't requested any eSIMs yet. Get started by requesting your first eSIM.</p>
           <button 
-            className="btn-primary"
+            className="btn-secondary"
             onClick={() => navigate('/esimrequest')}
           >
             Request Your First eSIM

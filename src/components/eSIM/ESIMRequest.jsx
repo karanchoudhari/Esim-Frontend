@@ -233,7 +233,7 @@ const ESIMRequest = () => {
   }
 
   return (
-    <div className="form-container">
+    <div className="form-container" style={{marginTop:"5%"}}>
       {/* Compact Professional Notification */}
       {notification.show && (
         <div className="notification-wrapper">

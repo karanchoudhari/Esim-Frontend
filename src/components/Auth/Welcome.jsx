@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import './Welcome.css';
+import logo from "../../assets/logo.png"
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -50,31 +51,6 @@ const Welcome = () => {
         <div className="bg-circle bg-circle-3"></div>
       </div>
 
-      {/* Navigation */}
-      {/* <nav className="welcome-nav">
-        <div className="nav-container">
-          <div className="nav-content">
-            <div className="nav-logo" onClick={() => navigate('/')}>
-              <span className="logo-icon">📶</span>
-              <span className="logo-text">eSIMPro</span>
-            </div>
-            <div className="nav-links">
-              <button 
-                onClick={() => navigate('/login')}
-                className="nav-link"
-              >
-                Login
-              </button>
-              <button 
-                onClick={() => navigate('/signup')}
-                className="nav-signup"
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav> */}
 
       {/* Hero Section */}
       <section className="hero-section">
@@ -91,7 +67,7 @@ const Welcome = () => {
               <div className="hero-buttons">
                 <button 
                   onClick={() => navigate('/signup')}
-                  className="btn btn-primary"
+                  className="btn btn-secondary"
                 >
                   <span>Get Started Now</span>
                   <svg className="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -168,7 +144,7 @@ const Welcome = () => {
       {/* How It Works Section */}
       <section className="process-section">
         <div className="container">
-          <div className="section-header">
+          <div className="section-header flex items-center flex-col text-center">
             <h2 className="section-title">How it works</h2>
             <p className="section-subtitle">Get your eSIM in three simple steps</p>
           </div>
@@ -397,8 +373,8 @@ const Welcome = () => {
     <div className="footer-content">
       <div className="footer-brand">
         <div className="footer-logo">
-          <span className="logo-icon">📶</span>
-          <span className="logo-text">eSIMPro</span>
+        <img src={logo} className="" style={{width:"50px"}} ></img>
+          <span className="logo-text">E-SIMPro</span>
         </div>
         <p className="footer-description">
           The world's leading digital SIM provider, connecting you to what matters most.
@@ -488,202 +464,9 @@ const Welcome = () => {
     </div>
   </div>
 
-  <style jsx>{`
-    .footer {
-      background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
-      color: var(--white);
-      padding: 60px 0 20px;
-      margin-top: auto;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .footer::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--primary), transparent);
-    }
-
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3rem;
-      margin-bottom: 3rem;
-    }
-
-    @media (min-width: 768px) {
-      .footer-content {
-        grid-template-columns: 1fr 2fr;
-      }
-    }
-
-    .footer-brand {
-      max-width: 300px;
-    }
-
-    .footer-logo {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    .logo-icon {
-      margin-right: 0.5rem;
-      font-size: 2rem;
-    }
-
-    .footer-description {
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .social-links {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .social-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.7);
-      transition: var(--transition);
-    }
-
-    .social-link:hover {
-      background: var(--primary);
-      color: var(--white);
-      transform: translateY(-2px);
-    }
-
-    .footer-links-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-    }
-
-    @media (min-width: 992px) {
-      .footer-links-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .link-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .link-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.2rem;
-      color: var(--white);
-      position: relative;
-      padding-bottom: 0.5rem;
-    }
-
-    .link-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 30px;
-      height: 2px;
-      background: var(--primary);
-    }
-
-    .footer-link {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      margin-bottom: 0.8rem;
-      transition: var(--transition);
-      background: none;
-      border: none;
-      text-align: left;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-
-    .footer-link:hover {
-      color: var(--primary);
-      transform: translateX(5px);
-    }
-
-    .admin-btn {
-      color: var(--primary);
-      font-weight: 500;
-    }
-
-    .admin-btn:hover {
-      color: var(--accent);
-    }
-
-    .footer-bottom {
-      padding-top: 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .footer-bottom-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    @media (min-width: 768px) {
-      .footer-bottom-content {
-        flex-direction: row;
-        justify-content: space-between;
-      }
-    }
-
-    .copyright {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.9rem;
-    }
-
-    .footer-badges {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.8rem;
-    }
-
-    .badge svg {
-      color: var(--primary);
-    }
-  `}</style>
 </footer>
     </div>
   );
 };
 
-export default Welcome;
+export default Welcome; 

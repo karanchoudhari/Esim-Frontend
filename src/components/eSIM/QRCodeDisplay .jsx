@@ -2,7 +2,7 @@ import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
 const QRCodeDisplay = ({ qrCodeData,userName }) => {
-  console.log("QRCodeDisplay rendered with data:", qrCodeData ? qrCodeData.substring(0, 50) + "..." : "NULL");
+  // console.log("QRCodeDisplay rendered with data:", qrCodeData ? qrCodeData.substring(0, 50) + "..." : "NULL");
   
   if (!qrCodeData) {
     return (
@@ -65,7 +65,7 @@ const QRCodeDisplay = ({ qrCodeData,userName }) => {
             console.error("Image failed to load:", e);
             e.target.style.display = 'none';
           }}
-          onLoad={() => console.log("QR Code image loaded successfully")}
+          // onLoad={() => console.log("QR Code image loaded successfully")}
         />
       ) : (
         // Generate QR code from text if it's not an image

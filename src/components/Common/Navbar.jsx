@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../redux/Createuser';
 import './Navbar.css';
+import logo from "../../assets/logo.png"
 
 const Navbar = () => {
   const { User } = useSelector((state) => state.Auth);
@@ -13,6 +14,35 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if user is admin by verifying token in localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      // You might want to decode the token to check if it's an admin token
+      // For now, we'll assume if there's a token and user role is admin in Redux or localStorage
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          if (parsedUser.role === 'admin') {
+            setIsAdmin(true);
+            return;
+          }
+        } catch (e) {
+          console.error('Error parsing user data from localStorage', e);
+        }
+      }
+      
+      // Fallback to Redux state
+      if (User && User.role === 'admin') {
+        setIsAdmin(true);
+      }
+    } else {
+      setIsAdmin(false);
+    }
+  }, [User, location]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +60,13 @@ const Navbar = () => {
   }, [location]);
 
   const handleLogout = () => {
+    // Clear admin token from localStorage if exists
+    if (localStorage.getItem('token')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+    }
     dispatch(logout());
+    setIsAdmin(false);
     navigate('/');
   };
 
@@ -43,29 +79,52 @@ const Navbar = () => {
   };
 
   const handleLogoClick = () => {
-    if (!User) {
+    const token = localStorage.getItem('token');
+    if (!token && !User) {
       navigate('/');
-    } else if (User.role === 'admin') {
-      navigate('/admin/dashboard'); // Fixed: changed from '/admin-home' to '/admin/dashboard'
+    } else if (isAdmin) {
+      navigate('/admin/dashboard');
     } else {
       navigate('/');
     }
   };
 
+  // Check if user is logged in (either through Redux or localStorage)
+  const isLoggedIn = () => {
+    return User || localStorage.getItem('token');
+  };
+
   return (
     <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
       <div className="nav-container">
-        <div className="nav-logo" onClick={handleLogoClick}>
-          <span className="logo-icon">📶</span>
-          <span className="logo-text">eSIMPro</span>
-        </div>
+      <div 
+  className="nav-logo group flex items-center cursor-pointer overflow-hidden"
+  onClick={handleLogoClick}
+>
+  <img 
+    src={logo} 
+    className="w-[50px]" 
+    alt="E-SIMPRO Logo"
+  />
+  <span 
+    className="
+      ml-2 transform -translate-x-full opacity-0 
+      group-hover:translate-x-0 group-hover:opacity-100
+      transition-all duration-500 ease-in-out
+      whitespace-nowrap
+    "
+  >
+    E-SIMPRO
+  </span>
+</div>
+
         
         <div className={`nav-menu ${isMenuOpen ? 'nav-menu-open' : ''}`}>
-          {User ? (
+          {isLoggedIn() ? (
             <>
               {/* Dashboard (different path for admin / user) */}
               <button 
-                onClick={() => navigate(User.role === 'admin' ? '/admin/dashboard' : '/home')}
+                onClick={() => navigate(isAdmin ? '/admin/dashboard' : '/home')}
                 className={`nav-link ${
                   location.pathname === '/home' || location.pathname === '/admin/dashboard'
                     ? 'nav-link-active'
@@ -79,7 +138,7 @@ const Navbar = () => {
               </button>
 
               {/* Admin-specific navigation items */}
-              {User.role === 'admin' && (
+              {isAdmin && (
                 <>
                   <button 
                     onClick={() => navigate('/admin/users')}
@@ -103,7 +162,7 @@ const Navbar = () => {
               )}
 
               {/* Only normal user sees My eSIMs */}
-              {User.role !== 'admin' && (
+              {!isAdmin && (
                 <button 
                   onClick={() => navigate('/status')}
                   className={`nav-link ${location.pathname === '/status' ? 'nav-link-active' : ''}`}
@@ -129,7 +188,7 @@ const Navbar = () => {
                   </svg>
                 </button>
                 <div className={`nav-dropdown-menu ${activeDropdown === 'account' ? 'nav-dropdown-menu-open' : ''}`}>
-                  <button 
+                  {/* <button 
                     onClick={() => navigate('/profile')}
                     className="nav-dropdown-item"
                   >
@@ -138,8 +197,8 @@ const Navbar = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     Profile
-                  </button>
-                  <button 
+                  </button> */}
+                  {/* <button 
                     onClick={() => navigate('/settings')}
                     className="nav-dropdown-item"
                   >
@@ -148,7 +207,7 @@ const Navbar = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     Settings
-                  </button>
+                  </button> */}
                   <div className="dropdown-divider"></div>
                   <button 
                     onClick={handleLogout}

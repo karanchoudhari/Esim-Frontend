@@ -141,7 +141,7 @@ body {
 } */
 
 /* Welcome Page */
-.welcome-page {
+/* .welcome-page {
   text-align: center;
   padding: 4rem 2rem;
 }
@@ -178,7 +178,7 @@ body {
 
 .welcome-buttons button:hover {
   background-color: #2980b9;
-}
+} */
 
 /* Dashboard */
 /* .dashboard {
@@ -319,7 +319,7 @@ body {
 } */
 
 /* Admin Dashboard */
-.admin-dashboard {
+/* .admin-dashboard {
   padding: 2rem;
 }
 
@@ -391,7 +391,7 @@ body {
 
 .admin-section button:hover {
   background-color: #2980b9;
-}
+} */
 
 /* Messages */
 .loading {
@@ -417,7 +417,7 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .navbar .container {
     flex-direction: column;
   }
@@ -445,7 +445,7 @@ body {
     display: block;
     overflow-x: auto;
   }
-}
+} */
 
 /* .form-container {
   max-width: 400px;
@@ -513,8 +513,3 @@ body {
   font-size: 18px;
   color: #666;
 } */
-
-/* Recaptcha container */
-#recaptcha-container {
-  margin-bottom: 15px;
-}

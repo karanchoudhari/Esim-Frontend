@@ -62,12 +62,26 @@ const Authslice = createSlice({
         clearError: (state) => {
             state.isError = false;
         },
-        logout: (state) => {
-            state.isLoading = false;
-            state.isError = false;
-            state.User = null;
-            localStorage.removeItem("token"); // Ensure token is removed
-        },
+     // In your Authslice.js
+logout: (state) => {
+  state.isLoading = false;
+  state.isError = false;
+  state.User = null;
+  localStorage.removeItem("token");
+  localStorage.removeItem("userData");
+  
+  // Clear all user chat sessions
+  if (state.User && state.User._id) {
+    sessionStorage.removeItem(`user_chat_${state.User._id}`);
+  }
+  
+  // Clear all possible chat sessions (fallback)
+  Object.keys(sessionStorage).forEach(key => {
+    if (key.startsWith('user_chat_')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+},
         resetForgotPasswordStatus: (state) => {
             state.forgotPasswordStatus = 'idle';
             state.forgotPasswordMessage = '';
@@ -99,14 +113,31 @@ const Authslice = createSlice({
                 state.isLoading = true;
                 state.isError = false;
             })
+            // .addCase(LoginUser.fulfilled, (state, action) => {
+            //     state.isLoading = false;
+            //     state.isError = false;
+            //     state.User = action.payload.data || action.payload;
+            //     // Store token
+            //     const token = action.payload.data?.token || action.payload.token;
+            //     if (token) {
+            //         localStorage.setItem("token", token);
+            //     }
+            // })
             .addCase(LoginUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isError = false;
+                
+                // Store the complete user data in Redux state
                 state.User = action.payload.data || action.payload;
-                // Store token
+                
+                // Store token AND user data in localStorage
                 const token = action.payload.data?.token || action.payload.token;
+                const userData = action.payload.data || action.payload.data;
+                
                 if (token) {
                     localStorage.setItem("token", token);
+                    // Store the complete user data including role
+                    localStorage.setItem("userData", JSON.stringify(userData));
                 }
             })
             .addCase(LoginUser.rejected, (state) => {

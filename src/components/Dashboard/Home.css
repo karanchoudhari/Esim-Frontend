@@ -398,3 +398,152 @@
     padding: 2rem;
   }
 }
+
+
+/* KYC Popup Styles */
+.kyc-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.kyc-popup {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.popup-header i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.popup-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 18px;
+}
+
+.popup-close {
+  /* background: rgba(255, 255, 255, 0.2); */
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  /* border-radius: 50%; */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  font-size: 18px; /* make X icon balanced */
+  line-height: 1; /* fix vertical alignment */
+  padding: 0; /* remove extra spacing */
+}
+
+.popup-close i {
+  pointer-events: none; /* ensures only button is clickable */
+}
+
+.popup-close:hover {
+  /* background: rgba(255, 255, 255, 0.3); */
+}
+
+.popup-content {
+  padding: 20px;
+}
+
+.popup-content p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  color: #666;
+}
+
+.popup-status {
+  margin: 20px 0;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.status-indicator.pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-indicator i {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.popup-actions {
+  padding: 0 20px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.popup-actions .btn-primary {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .kyc-popup {
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+  
+  .popup-header {
+    padding: 15px;
+  }
+  
+  .popup-content {
+    padding: 15px;
+  }
+}

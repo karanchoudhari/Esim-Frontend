@@ -27,7 +27,10 @@ const AdminLogin = () => {
       
       // ✅ Check if user is admin
       if (response.data.data.role === 'admin' || response.data.data.email === 'Admin@gmail.com') {
+        // ✅ Store BOTH token AND user data in localStorage
         localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('userData', JSON.stringify(response.data.data));
+        
         navigate('/admin/dashboard');
       } else {
         setError('Access denied. Admin privileges required.');

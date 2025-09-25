@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AxiosInstance from '../../../Axiosinstance';
 import './AdminDashboard.css';
+import AdminChat from './AdminChat';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,8 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingKYC: 0,
-    pendingESIM: 0
+    pendingESIM: 0,
+    unreadMessages: 0
   });
   const [selectedKYC, setSelectedKYC] = useState(null);
   const [selectedESIM, setSelectedESIM] = useState(null);
@@ -21,6 +23,15 @@ const AdminDashboard = () => {
   const [editingKYC, setEditingKYC] = useState(false);
   const [editingESIM, setEditingESIM] = useState(false);
   const navigate = useNavigate();
+  
+  // Pagination states
+  const [currentKycPage, setCurrentKycPage] = useState(1);
+  const [currentEsimPage, setCurrentEsimPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  
+  // Filter states
+  const [userFilter, setUserFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -33,61 +44,110 @@ const AdminDashboard = () => {
   }, [navigate]);
   
   const fetchData = async () => {
+    // try {
+    //   setLoading(true);
+      
+    //   // Fetch users
+    //   const usersResponse = await AxiosInstance.get('/admin/users');
+    //   const usersWithKYC = usersResponse.data.map(user => ({
+    //     ...user,
+    //     kycStatus: user.kycStatus || 'not_submitted'
+    //   }));
+    //   setUsers(usersWithKYC);
+      
+    //   // Fetch KYC submissions
+    //   const kycResponse = await AxiosInstance.get('/admin/kyc-submissions');
+    //   setKycSubmissions(kycResponse.data);
+      
+    //   // Fetch eSIM requests
+    //   const esimsResponse = await AxiosInstance.get('/admin/esim-requests');
+    //   setEsims(esimsResponse.data);
+
+     try {
+    setLoading(true);
+    
+    // Fetch users
+    const usersResponse = await AxiosInstance.get('/admin/users');
+    const usersWithKYC = usersResponse.data.map(user => ({
+      ...user,
+      kycStatus: user.kycStatus || 'not_submitted'
+    }));
+    setUsers(usersWithKYC);
+    
+    // Fetch KYC submissions - Add error handling
+    let kycSubmissionsData = [];
     try {
-      setLoading(true);
-      
-      // Fetch users
-      const usersResponse = await AxiosInstance.get('/admin/users');
-      const usersWithKYC = usersResponse.data.map(user => ({
-        ...user,
-        kycStatus: user.kycStatus || 'not_submitted'
-      }));
-      setUsers(usersWithKYC);
-      
-      // Fetch KYC submissions
       const kycResponse = await AxiosInstance.get('/admin/kyc-submissions');
-      setKycSubmissions(kycResponse.data);
+      kycSubmissionsData = kycResponse.data;
+      setKycSubmissions(kycSubmissionsData);
+    } catch (kycError) {
+      console.error('Error fetching KYC submissions:', kycError);
+      // Continue with empty KYC data but don't block the entire dashboard
+    }
+    
+    // Fetch eSIM requests
+    const esimsResponse = await AxiosInstance.get('/admin/esim-requests');
+    setEsims(esimsResponse.data);
       
-      // Fetch eSIM requests
-      const esimsResponse = await AxiosInstance.get('/admin/esim-requests');
-      setEsims(esimsResponse.data);
-      
-      // Calculate stats
-      const pendingKYC = usersResponse.data.filter(kyc => kyc.kycStatus === 'pending').length;
-      const pendingESIM = esimsResponse.data.filter(esim => esim.status === 'pending').length;
-      
-      setStats({
-        totalUsers: usersWithKYC.length,
-        pendingKYC:pendingKYC,
-        pendingESIM
-      });
+      // Fetch unread messages count
+      try {
+        const messagesResponse = await AxiosInstance.get('/message/admin/users');
+        const unreadCount = messagesResponse.data.users.reduce((total, user) => total + (user.unreadCount || 0), 0);
+        
+        // Calculate stats
+        const pendingKYC = usersResponse.data.filter(kyc => kyc.kycStatus === 'pending').length;
+        const pendingESIM = esimsResponse.data.filter(esim => esim.status === 'pending').length;
+        
+        setStats({
+          totalUsers: usersWithKYC.length,
+          pendingKYC,
+          pendingESIM,
+          unreadMessages: unreadCount
+        });
+      } catch (error) {
+        console.error('Error fetching message stats:', error);
+        // Calculate stats without messages
+        const pendingKYC = usersResponse.data.filter(kyc => kyc.kycStatus === 'pending').length;
+        const pendingESIM = esimsResponse.data.filter(esim => esim.status === 'pending').length;
+        
+        setStats({
+          totalUsers: usersWithKYC.length,
+          pendingKYC,
+          pendingESIM,
+          unreadMessages: 0
+        });
+      }
       
     } catch (error) {
+      // console.error('Error fetching admin data:', error);
+      // if (error.response?.status === 401) {
+      //   localStorage.removeItem('token');
+      //   navigate('/admin/login');
       console.error('Error fetching admin data:', error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/admin/login');
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      navigate('/admin/login');
       }
     } finally {
       setLoading(false);
     }
   };
   
-  const handleKYCApproval = async (kycId, status, userName) => {
-    try {
-      await AxiosInstance.put(`/admin/kyc/${kycId}`, { status });
+  // const handleKYCApproval = async (kycId, status, userName) => {
+  //   try {
+  //     await AxiosInstance.put(`/admin/kyc/${kycId}`, { status });
       
-      // Show notification
-      showNotification(`KYC for ${userName} has been ${status} successfully`, 'success');
+  //     // Show notification
+  //     showNotification(`KYC for ${userName} has been ${status} successfully`, 'success');
       
-      fetchData(); // Refresh all data
-      setShowKYCModal(false);
-      setEditingKYC(false);
-    } catch (error) {
-      console.error('Error updating KYC status:', error);
-      showNotification('Error updating KYC status', 'error');
-    }
-  };
+  //     fetchData(); // Refresh all data
+  //     setShowKYCModal(false);
+  //     setEditingKYC(false);
+  //   } catch (error) {
+  //     console.error('Error updating KYC status:', error);
+  //     showNotification('Error updating KYC status', 'error');
+  //   }
+  // };
   
   const handleESIMStatus = async (esimId, status, userName) => {
     try {
@@ -167,7 +227,88 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/admin/login');
+    localStorage.removeItem('userData');
+    navigate('/');
+  };
+
+  // Filter users based on search input and status filter
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(userFilter.toLowerCase()) || 
+                          user.email.toLowerCase().includes(userFilter.toLowerCase());
+    
+    const userKYC = findUserKYC(user._id);
+    const kycStatus = userKYC ? userKYC.status : user.kycStatus;
+    
+    const matchesStatus = statusFilter === 'all' || kycStatus === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  // Pagination logic for KYC tab
+  const indexOfLastKycItem = currentKycPage * itemsPerPage;
+  const indexOfFirstKycItem = indexOfLastKycItem - itemsPerPage;
+  const currentKycItems = filteredUsers.slice(indexOfFirstKycItem, indexOfLastKycItem);
+  const totalKycPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  // Pagination logic for eSIM tab
+  const indexOfLastEsimItem = currentEsimPage * itemsPerPage;
+  const indexOfFirstEsimItem = indexOfLastEsimItem - itemsPerPage;
+  const currentEsimItems = esims.slice(indexOfFirstEsimItem, indexOfLastEsimItem);
+  const totalEsimPages = Math.ceil(esims.length / itemsPerPage);
+
+  // Change page
+  const paginate = (pageNumber, tab) => {
+    if (tab === 'kyc') {
+      setCurrentKycPage(pageNumber);
+    } else {
+      setCurrentEsimPage(pageNumber);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = (totalPages, currentPage) => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1);
+      
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      if (currentPage <= 2) {
+        endPage = 4;
+      } else if (currentPage >= totalPages - 1) {
+        startPage = totalPages - 3;
+      }
+      
+      // Add ellipsis if needed
+      if (startPage > 2) {
+        pageNumbers.push('...');
+      }
+      
+      // Add middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      // Add ellipsis if needed
+      if (endPage < totalPages - 1) {
+        pageNumbers.push('...');
+      }
+      
+      // Always show last page
+      if (totalPages > 1) {
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
   };
 
   if (loading) {
@@ -232,6 +373,18 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+        
+        <div className="stat-card">
+          <div className="stat-content">
+            <div>
+              <p className="stat-label">Unread Messages</p>
+              <h3 className="stat-value">{stats.unreadMessages}</h3>
+            </div>
+            <div className="stat-icon messages">
+              <i className="fas fa-comments"></i>
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Tabs Navigation */}
@@ -250,6 +403,16 @@ const AdminDashboard = () => {
           <i className="fas fa-wifi"></i>
           eSIM Requests
         </button>
+        <button 
+          className={`admin-tab ${activeTab === 'chat' ? 'tab-active' : ''}`} 
+          onClick={() => setActiveTab('chat')}
+        >
+          <i className="fas fa-comments"></i>
+          Customer Chat
+          {stats.unreadMessages > 0 && (
+            <span className="tab-badge">{stats.unreadMessages.data}</span>
+          )}
+        </button>
       </div>
       
       {/* Users & KYC Section */}
@@ -257,12 +420,36 @@ const AdminDashboard = () => {
         <div className="admin-section">
           <div className="section-header">
             <h3>Users & KYC Approvals</h3>
+            <div className="filter-controls">
+              <div className="search-box">
+                <i className="fas fa-search"></i>
+                <input
+                  type="text"
+                  placeholder="Search users by name or email..."
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                />
+              </div>
+              <div className="status-filter">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="not_submitted">Not Submitted</option>
+                </select>
+              </div>
+            </div>
           </div>
           
           <div className="table-container">
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th>S.No</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>KYC Status</th>
@@ -270,19 +457,21 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.length === 0 ? (
+                {currentKycItems.length === 0 ? (
                   <tr className="loading-row">
-                    <td colSpan="4" className="text-center">
-                      {loading ? 'Loading users...' : 'No users found'}
+                    <td colSpan="5" className="text-center">
+                      No users found matching your criteria
                     </td>
                   </tr>
                 ) : (
-                  users.map(user => {
+                  currentKycItems.map((user, index) => {
                     const userKYC = findUserKYC(user._id);
                     const kycStatus = userKYC ? userKYC.status : user.kycStatus;
+                    const serialNo = indexOfFirstKycItem + index + 1;
                     
                     return (
                       <tr key={user._id}>
+                        <td>{serialNo}</td>
                         <td>
                           <div className="user-info">
                             <div className="user-name">{user.name}</div>
@@ -313,6 +502,46 @@ const AdminDashboard = () => {
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination for KYC Table */}
+          {totalKycPages > 1 && (
+            <div className="pagination-container">
+              <div className="pagination">
+                <button
+                  onClick={() => paginate(currentKycPage - 1, 'kyc')}
+                  disabled={currentKycPage === 1}
+                  className="pagination-btn"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                
+                {getPageNumbers(totalKycPages, currentKycPage).map((pageNumber, index) => (
+                  pageNumber === '...' ? (
+                    <span key={index} className="pagination-ellipsis">...</span>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={() => paginate(pageNumber, 'kyc')}
+                      className={`pagination-btn ${currentKycPage === pageNumber ? 'active' : ''}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  )
+                ))}
+                
+                <button
+                  onClick={() => paginate(currentKycPage + 1, 'kyc')}
+                  disabled={currentKycPage === totalKycPages}
+                  className="pagination-btn"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div className="pagination-info">
+                Showing {indexOfFirstKycItem + 1} to {Math.min(indexOfLastKycItem, filteredUsers.length)} of {filteredUsers.length} entries
+              </div>
+            </div>
+          )}
         </div>
       )}
       
@@ -327,6 +556,7 @@ const AdminDashboard = () => {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th>S.No</th>
                   <th>User</th>
                   <th>ICCID</th>
                   <th>Status</th>
@@ -335,64 +565,116 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {esims.length === 0 ? (
+                {currentEsimItems.length === 0 ? (
                   <tr className="loading-row">
-                    <td colSpan="5" className="text-center">
-                      {loading ? 'Loading eSIM requests...' : 'No eSIM requests found'}
+                    <td colSpan="6" className="text-center">
+                      No eSIM requests found
                     </td>
                   </tr>
                 ) : (
-                  esims.map(esim => (
-                    <tr key={esim._id}>
-                      <td>
-                        <div className="user-info">
-                          <div className="user-name">{esim.userId?.name || 'Unknown User'}</div>
-                        </div>
-                      </td>
-                      <td className="esim-iccid">{esim.iccid || 'N/A'}</td>
-                      <td>
-                        <span className={`status-badge ${getStatusClass(esim.status)}`}>
-                          {esim.status}
-                        </span>
-                      </td>
-                      <td>{new Date(esim.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <div className="action-buttons">
-                          <button 
-                            className="btn-info"
-                            onClick={() => viewESIMDetails(esim)}
-                          >
-                            <i className="fas fa-eye"></i> Details
-                          </button>
-                          {esim.status === 'pending' && (
-                            <>
-                              <button 
-                                className="btn-success" 
-                                onClick={() => handleESIMStatus(esim._id, 'activated', esim.userId?.name || 'user')}
-                              >
-                                <i className="fas fa-bolt"></i> Activate
-                              </button>
-                              <button 
-                                className="btn-danger" 
-                                onClick={() => handleESIMStatus(esim._id, 'failed', esim.userId?.name || 'user')}
-                              >
-                                <i className="fas fa-times"></i> Reject
-                              </button>
-                            </>
-                          )}
-                          {esim.status !== 'pending' && (
-                            <span className="no-action">
-                              Already {esim.status}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  currentEsimItems.map((esim, index) => {
+                    const serialNo = indexOfFirstEsimItem + index + 1;
+                    
+                    return (
+                      <tr key={esim._id}>
+                        <td>{serialNo}</td>
+                        <td>
+                          <div className="user-info">
+                            <div className="user-name">{esim.userId?.name || 'Unknown User'}</div>
+                          </div>
+                        </td>
+                        <td className="esim-iccid">{esim.iccid || 'N/A'}</td>
+                        <td>
+                          <span className={`status-badge ${getStatusClass(esim.status)}`}>
+                            {esim.status}
+                          </span>
+                        </td>
+                        <td>{new Date(esim.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <div className="action-buttons">
+                            <button 
+                              className="btn-info"
+                              onClick={() => viewESIMDetails(esim)}
+                            >
+                              <i className="fas fa-eye"></i> Details
+                            </button>
+                            {esim.status === 'pending' && (
+                              <>
+                                <button 
+                                  className="btn-success" 
+                                  onClick={() => handleESIMStatus(esim._id, 'activated', esim.userId?.name || 'user')}
+                                >
+                                  <i className="fas fa-bolt"></i> Activate
+                                </button>
+                                <button 
+                                  className="btn-danger" 
+                                  onClick={() => handleESIMStatus(esim._id, 'failed', esim.userId?.name || 'user')}
+                                >
+                                  <i className="fas fa-times"></i> Reject
+                                </button>
+                              </>
+                            )}
+                            {esim.status !== 'pending' && (
+                              <span className="no-action">
+                                Already {esim.status}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination for eSIM Table */}
+          {totalEsimPages > 1 && (
+            <div className="pagination-container">
+              <div className="pagination">
+                <button
+                  onClick={() => paginate(currentEsimPage - 1, 'esim')}
+                  disabled={currentEsimPage === 1}
+                  className="pagination-btn"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                
+                {getPageNumbers(totalEsimPages, currentEsimPage).map((pageNumber, index) => (
+                  pageNumber === '...' ? (
+                    <span key={index} className="pagination-ellipsis">...</span>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={() => paginate(pageNumber, 'esim')}
+                      className={`pagination-btn ${currentEsimPage === pageNumber ? 'active' : ''}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  )
+                ))}
+                
+                <button
+                  onClick={() => paginate(currentEsimPage + 1, 'esim')}
+                  disabled={currentEsimPage === totalEsimPages}
+                  className="pagination-btn"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div className="pagination-info">
+                Showing {indexOfFirstEsimItem + 1} to {Math.min(indexOfLastEsimItem, esims.length)} of {esims.length} entries
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Chat Section */}
+      {activeTab === 'chat' && (
+        <div className="admin-section">
+          <AdminChat onMessageUpdate={() => fetchData()} />
         </div>
       )}
       
@@ -509,7 +791,7 @@ const AdminDashboard = () => {
             <div className="modal-footer">
               {!editingKYC ? (
                 <button 
-                  className="btn-primary" 
+                  className="btn" 
                   onClick={() => setEditingKYC(true)}
                 >
                   <i className="fas fa-edit"></i> Update Status
