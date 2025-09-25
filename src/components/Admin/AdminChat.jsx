@@ -125,7 +125,7 @@ const AdminChat = () => {
     console.log("🔄 AdminChat - Creating direct socket connection with token:", !!token);
     
     if (token) {
-      const newSocket = io('http://localhost:4000', {
+      const newSocket = io('https://esim-backend-lmen.onrender.com', {
         auth: {
           token: token
         },
