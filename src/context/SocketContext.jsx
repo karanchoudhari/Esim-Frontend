@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     
     if (token && User) {
-      const newSocket = io('http://localhost:4000', {
+      const newSocket = io('https://esim-backend-lmen.onrender.com', {
         auth: { token },
         transports: ['websocket', 'polling']
       });
