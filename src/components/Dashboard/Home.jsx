@@ -10,7 +10,7 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { User, isLoading } = useSelector((state) => state.Auth);
-  const { kycStatus } = useSelector((state) => state.kyc);
+  const { kycStatus, kycDetails } = useSelector((state) => state.kyc);
   const { esim } = useSelector((state) => state.esim);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [showKYCPopup, setShowKYCPopup] = useState(false);
@@ -34,10 +34,21 @@ const Home = () => {
   };
 
   const HandleKYC = () => {
-    // If KYC is already submitted and status is pending, show popup
-    if (kycStatus === 'pending') {
-      setShowKYCPopup(true);
+    // Check if user has uploaded KYC documents
+    const hasUploadedKYC = kycDetails !== null;
+    
+    if (hasUploadedKYC) {
+      // If KYC is uploaded, check status
+      if (kycStatus === 'pending') {
+        setShowKYCPopup(true);
+      } else if (kycStatus === 'approved') {
+        // Already approved, no action needed
+        return;
+      } else {
+        navigate('/kyc');
+      }
     } else {
+      // No KYC uploaded, navigate to KYC page
       navigate('/kyc');
     }
   };
@@ -54,6 +65,10 @@ const Home = () => {
   const userEsims = esim?.data || [];
   const activeEsimCount = userEsims.filter(e => e.status === 'activated').length;
   const pendingRequestsCount = userEsims.filter(e => e.status === 'pending').length;
+
+  // Determine if user has submitted KYC
+  const hasSubmittedKYC = kycDetails !== null;
+  const displayKYCStatus = hasSubmittedKYC ? kycStatus : 'not_started';
 
   if (isLoading || isPageLoading) {
     return (
@@ -89,17 +104,24 @@ const Home = () => {
                   <p>Verify your identity to request an eSIM and access all features</p>
                   <button onClick={HandleKYC} className="btn">
                     <span>
-                      {kycStatus === 'pending' ? 'Check KYC Status' : 'Start KYC Verification'}
+                      {displayKYCStatus === 'pending' ? 'Check KYC Status' : 
+                       displayKYCStatus === 'not_started' ? 'Start KYC Verification' : 
+                       'Verify KYC'}
                     </span>
                     <i className="fas fa-arrow-right"></i>
                   </button>
                 </div>
                 <div className="card-progress">
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{width: kycStatus === 'pending' ? '50%' : '0%'}}></div>
+                    <div className="progress-fill" style={{
+                      width: displayKYCStatus === 'pending' ? '50%' : 
+                             displayKYCStatus === 'approved' ? '100%' : '0%'
+                    }}></div>
                   </div>
                   <span className="progress-text">
-                    {kycStatus === 'pending' ? 'Under Review' : 'Not Started'}
+                    {displayKYCStatus === 'pending' ? 'Under Review' : 
+                     displayKYCStatus === 'approved' ? 'Verified' : 
+                     'Not Started'}
                   </span>
                 </div>
               </div>
@@ -155,9 +177,12 @@ const Home = () => {
                 <div className="stat-icon">
                   <i className="fas fa-id-card"></i>
                 </div>
-                <div className="stat-value">{kycStatus === 'approved' ? 'Verified' : 'Pending'}</div>
+                <div className="stat-value">
+                  {displayKYCStatus === 'approved' ? 'Verified' : 
+                   displayKYCStatus === 'pending' ? 'Pending' : 'Not Started'}
+                </div>
                 <div className="stat-label">KYC Status</div>
-                {kycStatus === 'approved' && <div className="verified-badge"><i className="fas fa-check"></i></div>}
+                {displayKYCStatus === 'approved' && <div className="verified-badge"><i className="fas fa-check"></i></div>}
               </div>
               <div className="stat-item">
                 <div className="stat-icon">
