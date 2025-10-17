@@ -69,8 +69,8 @@ const ESIMRequest = () => {
       return false;
     }
     
-    // Check if it starts with a valid digit (6-9 as per Indian numbering)
-    if (!/^[6-9]/.test(cleanedPhone)) {
+    // More flexible validation - allow any 10 digit number
+    if (!/^\d{10}$/.test(cleanedPhone)) {
       return false;
     }
     
@@ -83,7 +83,7 @@ const ESIMRequest = () => {
     
     const validatedPhone = validatePhoneNumber(phone);
     if (!validatedPhone) {
-      showNotification('Please enter a valid 10-digit phone number starting with 6-9', 'error');
+      showNotification('Please enter a valid 10-digit phone number', 'error');
       return;
     }
 
@@ -96,7 +96,8 @@ const ESIMRequest = () => {
         {
           headers: { 
             'Authorization': `Bearer ${token}`
-          }
+          },
+          timeout: 30000 // 30 seconds timeout
         }
       );
 
@@ -113,9 +114,20 @@ const ESIMRequest = () => {
       localStorage.removeItem('otpErrorCount');
     } catch (error) {
       console.error('Error sending OTP:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to send OTP. Please try again.';
-      showNotification(errorMessage, 'error');
-      setEmailOtpError(errorMessage);
+      
+      // Enhanced error handling
+      if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+        showNotification('Network error. Please check your connection.', 'error');
+      } else if (error.response?.status === 500) {
+        showNotification('Server error. Please try again later.', 'error');
+      } else if (error.response?.data?.code === 'EMAIL_SERVICE_ERROR') {
+        showNotification('Email service temporarily unavailable. Please try again in few minutes.', 'error');
+      } else {
+        const errorMessage = error.response?.data?.message || 'Failed to send OTP. Please try again.';
+        showNotification(errorMessage, 'error');
+      }
+      
+      setEmailOtpError(error.response?.data?.message || 'Failed to send OTP');
     } finally {
       setIsSendingOTP(false);
     }
@@ -137,7 +149,8 @@ const ESIMRequest = () => {
         {
           headers: { 
             'Authorization': `Bearer ${token}`
-          }
+          },
+          timeout: 15000
         }
       );
 
@@ -196,7 +209,8 @@ const ESIMRequest = () => {
         {
           headers: { 
             'Authorization': `Bearer ${token}`
-          }
+          },
+          timeout: 30000
         }
       );
 

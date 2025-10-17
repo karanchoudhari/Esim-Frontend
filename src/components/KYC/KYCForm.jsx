@@ -21,6 +21,10 @@ const KYCForm = () => {
   const [showCamera, setShowCamera] = useState(false);
   const [cameraError, setCameraError] = useState('');
   const [isCapturing, setIsCapturing] = useState(false);
+  
+  // Modal state
+  const [showSelfieModal, setShowSelfieModal] = useState(false);
+  
   const webcamRef = useRef(null);
   
   const dispatch = useDispatch();
@@ -43,6 +47,7 @@ const KYCForm = () => {
   const openCamera = () => {
     setCameraError('');
     setShowCamera(true);
+    setShowSelfieModal(false);
   };
 
   const closeCamera = () => {
@@ -91,6 +96,25 @@ const KYCForm = () => {
     facingMode: "user"
   };
 
+  // Handle selfie box click - open modal with options
+  const handleSelfieClick = () => {
+    if (!selfiePreview) {
+      setShowSelfieModal(true);
+    }
+  };
+
+  // Handle upload photo option
+  const handleUploadPhoto = () => {
+    // Trigger the hidden file input
+    document.getElementById('selfieInput').click();
+    setShowSelfieModal(false);
+  };
+
+  // Handle live photo option
+  const handleLivePhoto = () => {
+    openCamera();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -136,16 +160,143 @@ const KYCForm = () => {
       console.error('KYC upload failed:', error);
     }
   };
-
-  // Handle selfie box click - directly open camera
-  const handleSelfieClick = () => {
-    if (!selfiePreview) {
-      openCamera();
-    }
-  };
   
   return (
     <div className="admin-login-container">
+      {/* Selfie Options Modal */}
+      {showSelfieModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-md"
+            style={{ 
+              backgroundColor: 'white', 
+              borderRadius: '0.5rem', 
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              padding: '1.5rem',
+              width: '91.666667%',
+              maxWidth: '28rem'
+            }}
+          >
+            <div 
+              className="flex justify-between items-center mb-4"
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}
+            >
+              <h3 
+                className="text-lg font-semibold"
+                style={{ fontSize: '1.125rem', fontWeight: '600' }}
+              >
+                Add Selfie with ID
+              </h3>
+              <button 
+                onClick={() => setShowSelfieModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+                style={{ color: '#6B7280' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6" style={{ width: '1.5rem', height: '1.5rem' }}>
+                  <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            
+            <p 
+              className="text-gray-600 mb-6"
+              style={{ color: '#4B5563', marginBottom: '1.5rem' }}
+            >
+              Choose how you want to add your selfie with ID
+            </p>
+            
+            <div 
+              className="flex flex-col space-y-4"
+              style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            >
+              <button
+                onClick={handleLivePhoto}
+                className="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '0.5rem',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                <div 
+                  className="flex items-center space-x-3"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-blue-600" style={{ width: '2rem', height: '2rem', color: '#2563EB' }}>
+                    <path d="M12 9a3.75 3.75 0 100 7.5A3.75 3.75 0 0012 9z" />
+                    <path fillRule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 001.11-.71l.822-1.315a2.942 2.942 0 012.332-1.39zM6.75 12.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0zm12-1.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                  </svg>
+                  <div 
+                    className="text-left"
+                    style={{ textAlign: 'left' }}
+                  >
+                    <div 
+                      className="font-medium text-gray-900"
+                      style={{ fontWeight: '500', color: '#111827' }}
+                    >
+                      Live Photo
+                    </div>
+                    <div 
+                      className="text-sm text-gray-500"
+                      style={{ fontSize: '0.875rem', color: '#6B7280' }}
+                    >
+                      Take a photo using your camera
+                    </div>
+                  </div>
+                </div>
+              </button>
+              
+              <button
+                onClick={handleUploadPhoto}
+                className="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '0.5rem',
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                <div 
+                  className="flex items-center space-x-3"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-green-600" style={{ width: '2rem', height: '2rem', color: '#059669' }}>
+                    <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5zM3 15.75a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+                  </svg>
+                  <div 
+                    className="text-left"
+                    style={{ textAlign: 'left' }}
+                  >
+                    <div 
+                      className="font-medium text-gray-900"
+                      style={{ fontWeight: '500', color: '#111827' }}
+                    >
+                      Upload Photo
+                    </div>
+                    <div 
+                      className="text-sm text-gray-500"
+                      style={{ fontSize: '0.875rem', color: '#6B7280' }}
+                    >
+                      Upload an existing photo from your device
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Camera Modal */}
       {showCamera && (
         <div className="camera-modal">
@@ -267,8 +418,8 @@ const KYCForm = () => {
           </div>
 
           <div className="documents-section">
-            <h3 className="section-title">Required Documents</h3>
-            <p className="section-subtitle">Upload clear images of the following documents</p>
+            <h3 className="section-title text-center">Required Documents</h3>
+            <p className="section-subtitle text-center">Upload clear images of the following documents</p>
             
             <div className="documents-grid">
               {/* ID Front */}
@@ -397,20 +548,20 @@ const KYCForm = () => {
                           </svg>
                           <span>Selfie with ID</span>
                           <div className="selfie-instruction">
-                            Click to take photo with camera
+                            Click to add selfie with ID
                           </div>
                         </div>
                       )}
                     </div>
                     {/* Hidden file input for form validation */}
                     <input
+                      id="selfieInput"
                       type="file"
                       onChange={(e) => handleFileChange(e, setSelfie, setSelfiePreview)}
                       accept="image/*"
                       required
                       className="document-input"
                       style={{ display: 'none' }}
-                      id="selfieInput"
                     />
                   </div>
                 </div>
