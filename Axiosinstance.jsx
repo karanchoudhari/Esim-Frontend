@@ -34,7 +34,8 @@ import axios from 'axios';
 
 const AxiosInstance = axios.create({
   // baseURL: 'http://localhost:4000/api/v1'
-  baseURL: 'https://esim-backend-lmen.onrender.com/api/v1'
+  // baseURL: 'https://esim-backend-lmen.onrender.com/api/v1'
+  baseURL: 'https://esim-backend-production-6610.up.railway.app/api/v1'
 });
 
 // Add authorization header automatically
