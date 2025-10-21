@@ -33,7 +33,8 @@ function App() {
         try {
           // const response = await AxiosInstance.get(
             const response = await fetch(
-              "https://esim-backend-lmen.onrender.com/api/v1/user/verify",
+              // "https://esim-backend-lmen.onrender.com/api/v1/user/verify",
+              "https://esim-backend-production-031b.up.railway.app/api/v1/user/verify",
               // "https://esim-backend-production-6610.up.railway.app/api/v1/user/verify",
             // "http://localhost:4000/api/v1/user/verify",
             {
